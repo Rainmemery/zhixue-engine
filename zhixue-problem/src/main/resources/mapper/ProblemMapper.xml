@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ProblemMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.Problem">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="tags" property="tags"/>
+        <result column="initial_code" property="initialCode"/>
+        <result column="solution_code" property="solutionCode"/>
+        <result column="test_cases" property="testCases"/>
+        <result column="time_limit_ms" property="timeLimitMs"/>
+        <result column="memory_limit_mb" property="memoryLimitMb"/>
+        <result column="success_rate" property="acceptanceRate"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="submit_count" property="submitCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, title, description, difficulty, category_id, tags, initial_code, solution_code,
+        test_cases, time_limit_ms, memory_limit_mb, success_rate as acceptance_rate, view_count, submit_count,
+        created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.Problem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO problems (title, description, difficulty, category_id, tags, initial_code,
+            solution_code, test_cases, time_limit_ms, memory_limit_mb, success_rate,
+            view_count, submit_count, created_at, updated_at)
+        VALUES (#{title}, #{description}, #{difficulty}, #{categoryId}, #{tags}, #{initialCode},
+            #{solutionCode}, #{testCases}, #{timeLimitMs}, #{memoryLimitMb}, #{acceptanceRate},
+            #{viewCount}, #{submitCount}, NOW(), NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.Problem">
+        UPDATE problems
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="difficulty != null">difficulty = #{difficulty},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="initialCode != null">initial_code = #{initialCode},</if>
+            <if test="solutionCode != null">solution_code = #{solutionCode},</if>
+            <if test="testCases != null">test_cases = #{testCases},</if>
+            <if test="timeLimitMs != null">time_limit_ms = #{timeLimitMs},</if>
+            <if test="memoryLimitMb != null">memory_limit_mb = #{memoryLimitMb},</if>
+            <if test="acceptanceRate != null">success_rate = #{acceptanceRate},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="submitCount != null">submit_count = #{submitCount},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM problems WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM problems
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM problems
+        <where>
+            <if test="difficulty != null and difficulty != ''">
+                AND difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="tags != null and tags != ''">
+                AND FIND_IN_SET(#{tags}, tags)
+            </if>
+            <if test="search != null and search != ''">
+                AND (title LIKE CONCAT('%', #{search}, '%') OR description LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(*)
+        FROM problems
+        <where>
+            <if test="difficulty != null and difficulty != ''">
+                AND difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="tags != null and tags != ''">
+                AND FIND_IN_SET(#{tags}, tags)
+            </if>
+            <if test="search != null and search != ''">
+                AND (title LIKE CONCAT('%', #{search}, '%') OR description LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <update id="incrementSolvedCount">
+        UPDATE problems SET submit_count = submit_count + 1, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateAcceptanceRate">
+        UPDATE problems SET success_rate = #{rate}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+</mapper>

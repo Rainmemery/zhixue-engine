@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.stats.problem.ProblemStatsMapper">
+
+    <select id="countTotalProblems" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM zhixue_problem WHERE deleted_at IS NULL
+    </select>
+
+    <select id="countProblemsByDifficulty" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM zhixue_problem WHERE difficulty = #{difficulty} AND deleted_at IS NULL
+    </select>
+
+    <select id="countTotalSubmissions" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM zhixue_submission
+    </select>
+
+    <select id="getProblemStats" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN difficulty = 'easy' THEN 1 ELSE 0 END) as easy,
+            SUM(CASE WHEN difficulty = 'medium' THEN 1 ELSE 0 END) as medium,
+            SUM(CASE WHEN difficulty = 'hard' THEN 1 ELSE 0 END) as hard
+        FROM zhixue_problem
+        WHERE deleted_at IS NULL
+    </select>
+
+</mapper>

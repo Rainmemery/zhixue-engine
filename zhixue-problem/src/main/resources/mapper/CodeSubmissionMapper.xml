@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.CodeSubmissionMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.CodeSubmission">
+        <id column="id" property="id"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="user_id" property="userId"/>
+        <result column="code" property="code"/>
+        <result column="language" property="language"/>
+        <result column="status" property="status"/>
+        <result column="score" property="score"/>
+        <result column="execution_time_ms" property="executionTimeMs"/>
+        <result column="memory_used_kb" property="memoryUsedKb"/>
+        <result column="test_case_results" property="testCaseResults"/>
+        <result column="feedback" property="feedback"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, problem_id, user_id, code, language, status, score, execution_time_ms,
+        memory_used_kb, test_case_results, feedback, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.CodeSubmission" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO code_submissions (problem_id, user_id, code, language, status, score,
+            execution_time_ms, memory_used_kb, test_case_results, feedback, created_at)
+        VALUES (#{problemId}, #{userId}, #{code}, #{language}, #{status}, #{score},
+            #{executionTimeMs}, #{memoryUsedKb}, #{testCaseResults}, #{feedback}, NOW())
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM code_submissions
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByProblemId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM code_submissions
+        WHERE problem_id = #{problemId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM code_submissions
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM code_submissions
+        <where>
+            <if test="problemId != null">
+                AND problem_id = #{problemId}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countByProblemId" resultType="int">
+        SELECT COUNT(*) FROM code_submissions WHERE problem_id = #{problemId}
+    </select>
+
+    <select id="countAcceptedByProblemId" resultType="int">
+        SELECT COUNT(*) FROM code_submissions WHERE problem_id = #{problemId} AND status = 'accepted'
+    </select>
+
+</mapper>

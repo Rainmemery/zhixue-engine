@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: zhixue-common-test
+
+server:
+  port: 0
+
+logging:
+  level:
+    com.rain.zhixuecommon: debug
+    org.springframework: info

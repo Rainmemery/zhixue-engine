@@ -1,0 +1,14 @@
+FROM openjdk:17-jdk-alpine
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add --no-cache bash coreutils
+
+RUN adduser -D judge && \
+    mkdir -p /home/judge/workspace && \
+    chown -R judge:judge /home/judge
+
+USER judge
+WORKDIR /home/judge
+
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8

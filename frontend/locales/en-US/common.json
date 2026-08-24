@@ -1,0 +1,174 @@
+{
+  "app": {
+    "name": "Zhixue AI",
+    "tagline": "AI-Powered Intelligent Learning Platform"
+  },
+  "nav": {
+    "sidebar": "Sidebar",
+    "mainNavigation": "Main Navigation",
+    "userSection": "User Section",
+    "dashboard": "Dashboard",
+    "problems": "Problems",
+    "learning": "Learning Path",
+    "aiChat": "AI Assistant",
+    "codeAssistant": "Code Assistant",
+    "smartQuestioner": "Smart Questioner",
+    "profile": "Profile",
+    "achievements": "Achievements",
+    "history": "History",
+    "admin": "Admin",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "theme": {
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode"
+  },
+  "sidebar": {
+    "expand": "Expand Sidebar",
+    "collapse": "Collapse Sidebar",
+    "keyboardShortcut": "Keyboard Shortcut"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your Zhixue AI account",
+      "username": "Username/Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up now"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Start your intelligent learning journey",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "phone": "Phone",
+      "realName": "Real Name",
+      "submit": "Sign Up",
+      "haveAccount": "Already have an account?",
+      "login": "Sign in now"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid username or password",
+      "usernameExists": "Username already exists",
+      "emailExists": "Email already registered",
+      "passwordMismatch": "Passwords do not match",
+      "weakPassword": "Password is too weak"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "stats": {
+      "solvedProblems": "Solved Problems",
+      "learningStreak": "Learning Streak",
+      "experiencePoints": "Experience Points",
+      "achievements": "Achievements"
+    },
+    "recentActivity": "Recent Activity",
+    "recommendedProblems": "Recommended Problems",
+    "learningProgress": "Learning Progress"
+  },
+  "problems": {
+    "title": "Coding Problems",
+    "search": "Search problems...",
+    "filters": {
+      "difficulty": "Difficulty",
+      "category": "Category",
+      "tags": "Tags",
+      "all": "All",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "acceptanceRate": "Acceptance Rate",
+    "submissions": "Submissions",
+    "solve": "Start Solving",
+    "submit": "Submit Code",
+    "run": "Run Tests",
+    "reset": "Reset Code"
+  },
+  "ai": {
+    "chat": {
+      "title": "AI Assistant",
+      "placeholder": "Type your question...",
+      "send": "Send",
+      "sending": "Sending...",
+      "thinking": "AI is thinking...",
+      "clear": "Clear Chat",
+      "clearChat": "Clear Chat History",
+      "copy": "Copy",
+      "copyMessage": "Copy Message",
+      "messages": "Chat Messages",
+      "userMessage": "User Message",
+      "assistantMessage": "Assistant Message",
+      "scrollToBottom": "Scroll to Bottom",
+      "inputLabel": "Message Input",
+      "inputHint": "Press Enter to send, Shift+Enter for new line",
+      "sentAt": "Sent at {{time}}"
+    },
+    "codeAssistant": {
+      "title": "Code Assistant",
+      "explain": "Explain Code",
+      "review": "Review Code",
+      "optimize": "Optimize Code",
+      "debug": "Debug Help"
+    },
+    "smartQuestioner": {
+      "title": "Smart Questioner",
+      "next": "Next",
+      "skip": "Skip",
+      "hint": "Hint"
+    }
+  },
+  "responseCard": {
+    "generating": "Generating...",
+    "copied": "Copied",
+    "copy": "Copy",
+    "delete": "Delete",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "chat": {
+    "userMessage": "User Message",
+    "assistantMessage": "Assistant Message",
+    "copied": "Copied",
+    "copy": "Copy"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "more": "More",
+    "less": "Less",
+    "show": "Show",
+    "hide": "Hide",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  }
+}

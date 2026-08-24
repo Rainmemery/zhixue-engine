@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ProblemCategoryMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ProblemCategory">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, description, sort_order, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ProblemCategory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO problem_categories (name, description, sort_order, created_at)
+        VALUES (#{name}, #{description}, #{sortOrder}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ProblemCategory">
+        UPDATE problem_categories
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM problem_categories WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM problem_categories
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM problem_categories
+        ORDER BY sort_order ASC
+    </select>
+
+</mapper>

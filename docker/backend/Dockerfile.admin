@@ -1,0 +1,29 @@
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+
+WORKDIR /build
+
+COPY pom.xml .
+COPY zhixue-common ./zhixue-common
+COPY zhixue-user ./zhixue-user
+COPY zhixue-problem ./zhixue-problem
+COPY zhixue-learning ./zhixue-learning
+COPY zhixue-ai ./zhixue-ai
+COPY zhixue-admin ./zhixue-admin
+COPY zhixue-getaway ./zhixue-getaway
+
+RUN mvn clean package -DskipTests -pl zhixue-common,zhixue-admin -am
+
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache tzdata curl
+
+COPY --from=builder /build/zhixue-admin/target/*.jar app.jar
+
+EXPOSE 8090
+
+ENV TZ=Asia/Shanghai
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app/app.jar"]

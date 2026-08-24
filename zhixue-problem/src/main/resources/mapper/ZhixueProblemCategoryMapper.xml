@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueProblemCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueProblemCategory">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="name_en" property="nameEn"/>
+        <result column="description" property="description"/>
+        <result column="icon" property="icon"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="problem_count" property="problemCount"/>
+        <result column="is_active" property="isActive"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, name_en, description, icon, parent_id, sort_order, problem_count, is_active, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemCategory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_problem_category (name, name_en, description, icon, parent_id, sort_order, problem_count, is_active, created_at)
+        VALUES (#{name}, #{nameEn}, #{description}, #{icon}, #{parentId}, #{sortOrder}, #{problemCount}, #{isActive}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemCategory">
+        UPDATE zhixue_problem_category
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="nameEn != null">name_en = #{nameEn},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="problemCount != null">problem_count = #{problemCount},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM zhixue_problem_category WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_category
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_category
+        ORDER BY sort_order ASC
+    </select>
+
+    <update id="updateProblemCount">
+        UPDATE zhixue_problem_category SET problem_count = #{problemCount} WHERE id = #{id}
+    </update>
+
+</mapper>

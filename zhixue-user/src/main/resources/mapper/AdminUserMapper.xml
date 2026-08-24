@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueuser.mapper.AdminUserMapper">
+
+    <resultMap id="UserResultMap" type="com.rain.zhixueuser.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="password_hash" property="passwordHash"/>
+        <result column="real_name" property="realName"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="phone" property="phone"/>
+        <result column="school" property="school"/>
+        <result column="major" property="major"/>
+        <result column="grade" property="grade"/>
+        <result column="learning_level" property="learningLevel"/>
+        <result column="experience_points" property="experiencePoints"/>
+        <result column="coins" property="coins"/>
+        <result column="achievement_score" property="achievementScore"/>
+        <result column="daily_streak" property="dailyStreak"/>
+        <result column="last_active_date" property="lastActiveDate"/>
+        <result column="is_active" property="isActive"/>
+        <result column="email_verified" property="emailVerfied"/>
+        <result column="phone_verified" property="phoneVerfied"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted_at" property="deletedAt"/>
+    </resultMap>
+
+    <select id="selectUserList" resultMap="UserResultMap">
+        SELECT 
+            id, username, email, real_name, phone, school, major,
+            learning_level, experience_points, is_active, created_at, updated_at
+        FROM users
+        <where>
+            deleted_at IS NULL
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND is_active = #{status}
+            </if>
+            <if test="search != null and search != ''">
+                AND (username LIKE CONCAT('%', #{search}, '%') 
+                     OR email LIKE CONCAT('%', #{search}, '%')
+                     OR real_name LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countUsers" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM users
+        <where>
+            deleted_at IS NULL
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND is_active = #{status}
+            </if>
+            <if test="search != null and search != ''">
+                AND (username LIKE CONCAT('%', #{search}, '%') 
+                     OR email LIKE CONCAT('%', #{search}, '%')
+                     OR real_name LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="selectById" resultMap="UserResultMap">
+        SELECT *
+        FROM users
+        WHERE id = #{id} AND deleted_at IS NULL
+    </select>
+
+    <insert id="insert" parameterType="com.rain.zhixueuser.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (
+            username, email, password_hash, real_name, avatar_url, phone,
+            school, major, grade, learning_level, experience_points, coins,
+            achievement_score, daily_streak, last_active_date, is_active,
+            email_verified, phone_verified, created_at, updated_at
+        ) VALUES (
+            #{username}, #{email}, #{passwordHash}, #{realName}, #{avatarUrl}, #{phone},
+            #{school}, #{major}, #{grade}, #{learningLevel}, #{experiencePoints}, #{coins},
+            #{achievementScore}, #{dailyStreak}, #{lastActiveDate}, #{isActive},
+            #{emailVerfied}, #{phoneVerfied}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueuser.entity.User">
+        UPDATE users
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="school != null">school = #{school},</if>
+            <if test="major != null">major = #{major},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id} AND deleted_at IS NULL
+    </update>
+
+    <update id="deleteById">
+        UPDATE users
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted_at IS NULL
+    </update>
+
+    <update id="batchDelete">
+        UPDATE users
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted_at IS NULL
+    </update>
+
+    <update id="updatePassword">
+        UPDATE users SET password_hash = #{passwordHash}, updated_at = NOW() WHERE id = #{id} AND deleted_at IS NULL
+    </update>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueProblemSampleMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueProblemSample">
+        <id column="id" property="id"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="sample_input" property="sampleInput"/>
+        <result column="sample_output" property="sampleOutput"/>
+        <result column="explanation" property="explanation"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, problem_id, sample_input, sample_output, explanation, sort_order, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemSample" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_problem_sample (problem_id, sample_input, sample_output, explanation, sort_order, created_at)
+        VALUES (#{problemId}, #{sampleInput}, #{sampleOutput}, #{explanation}, #{sortOrder}, NOW())
+    </insert>
+
+    <delete id="deleteByProblemId">
+        DELETE FROM zhixue_problem_sample WHERE problem_id = #{problemId}
+    </delete>
+
+    <select id="selectByProblemId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_sample
+        WHERE problem_id = #{problemId}
+        ORDER BY sort_order ASC
+    </select>
+
+</mapper>

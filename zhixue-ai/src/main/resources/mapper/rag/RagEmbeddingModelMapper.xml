@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueai.mapper.rag.RagEmbeddingModelMapper">
+    
+    <resultMap id="RagEmbeddingModelResultMap" type="com.rain.zhixueai.entity.rag.RagEmbeddingModel">
+        <id property="id" column="id"/>
+        <result property="modelName" column="model_name"/>
+        <result property="displayName" column="display_name"/>
+        <result property="dimension" column="dimension"/>
+        <result property="description" column="description"/>
+        <result property="isDefault" column="is_default"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="findAll" resultMap="RagEmbeddingModelResultMap">
+        SELECT * FROM rag_embedding_model ORDER BY is_default DESC, id ASC
+    </select>
+    
+    <select id="findAllEnabled" resultMap="RagEmbeddingModelResultMap">
+        SELECT * FROM rag_embedding_model WHERE status = 1 ORDER BY is_default DESC, id ASC
+    </select>
+    
+    <select id="findById" resultMap="RagEmbeddingModelResultMap">
+        SELECT * FROM rag_embedding_model WHERE id = #{id}
+    </select>
+    
+    <select id="findByModelName" resultMap="RagEmbeddingModelResultMap">
+        SELECT * FROM rag_embedding_model WHERE model_name = #{modelName}
+    </select>
+    
+    <select id="findDefault" resultMap="RagEmbeddingModelResultMap">
+        SELECT * FROM rag_embedding_model WHERE is_default = 1 AND status = 1 LIMIT 1
+    </select>
+    
+    <insert id="insert" parameterType="com.rain.zhixueai.entity.rag.RagEmbeddingModel" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO rag_embedding_model (
+            model_name, display_name, dimension, description, 
+            is_default, status, created_at, updated_at
+        ) VALUES (
+            #{modelName}, #{displayName}, #{dimension}, #{description},
+            #{isDefault}, #{status}, NOW(), NOW()
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.rain.zhixueai.entity.rag.RagEmbeddingModel">
+        UPDATE rag_embedding_model SET
+            model_name = #{modelName},
+            display_name = #{displayName},
+            dimension = #{dimension},
+            description = #{description},
+            is_default = #{isDefault},
+            status = #{status},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM rag_embedding_model WHERE id = #{id}
+    </delete>
+    
+    <update id="setDefault">
+        UPDATE rag_embedding_model SET is_default = 1, updated_at = NOW() WHERE id = #{id}
+    </update>
+    
+    <update id="clearDefault">
+        UPDATE rag_embedding_model SET is_default = 0, updated_at = NOW()
+    </update>
+    
+    <update id="updateStatus">
+        UPDATE rag_embedding_model SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+</mapper>

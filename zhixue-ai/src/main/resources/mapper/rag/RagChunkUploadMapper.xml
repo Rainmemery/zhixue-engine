@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueai.mapper.rag.RagChunkUploadMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueai.entity.rag.RagChunkUpload">
+        <id column="id" property="id"/>
+        <result column="upload_id" property="uploadId"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_type" property="fileType"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="total_chunks" property="totalChunks"/>
+        <result column="temp_path" property="tempPath"/>
+        <result column="knowledge_base_id" property="knowledgeBaseId"/>
+        <result column="title" property="title"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+    
+    <insert id="insert" parameterType="com.rain.zhixueai.entity.rag.RagChunkUpload">
+        INSERT INTO rag_chunk_upload (
+            upload_id, file_name, file_type, file_size, total_chunks,
+            temp_path, knowledge_base_id, title, created_by, status,
+            created_at, updated_at
+        ) VALUES (
+            #{uploadId}, #{fileName}, #{fileType}, #{fileSize}, #{totalChunks},
+            #{tempPath}, #{knowledgeBaseId}, #{title}, #{createdBy}, #{status},
+            NOW(), NOW()
+        )
+    </insert>
+    
+    <select id="findByUploadId" resultMap="BaseResultMap">
+        SELECT * FROM rag_chunk_upload WHERE upload_id = #{uploadId}
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE rag_chunk_upload SET status = #{status}, updated_at = NOW() WHERE upload_id = #{uploadId}
+    </update>
+    
+    <delete id="deleteByUploadId">
+        DELETE FROM rag_chunk_upload WHERE upload_id = #{uploadId}
+    </delete>
+    
+    <delete id="deleteExpiredUploads">
+        DELETE FROM rag_chunk_upload 
+        WHERE status IN (0, 1) 
+        AND created_at &lt; DATE_SUB(NOW(), INTERVAL #{expireHours} HOUR)
+    </delete>
+    
+    <select id="findPendingUploads" resultMap="BaseResultMap">
+        SELECT * FROM rag_chunk_upload WHERE status IN (0, 1) ORDER BY created_at DESC
+    </select>
+    
+</mapper>

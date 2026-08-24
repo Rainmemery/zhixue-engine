@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueProblemTagMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueProblemTag">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="name_en" property="nameEn"/>
+        <result column="color" property="color"/>
+        <result column="problem_count" property="problemCount"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, name_en, color, problem_count, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemTag" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_problem_tag (name, name_en, color, problem_count, created_at)
+        VALUES (#{name}, #{nameEn}, #{color}, #{problemCount}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemTag">
+        UPDATE zhixue_problem_tag
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="nameEn != null">name_en = #{nameEn},</if>
+            <if test="color != null">color = #{color},</if>
+            <if test="problemCount != null">problem_count = #{problemCount},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM zhixue_problem_tag WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_tag
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_tag
+        ORDER BY id ASC
+    </select>
+
+    <update id="updateProblemCount">
+        UPDATE zhixue_problem_tag SET problem_count = #{problemCount} WHERE id = #{id}
+    </update>
+
+</mapper>

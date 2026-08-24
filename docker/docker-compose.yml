@@ -1,0 +1,372 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: zhixue-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: zhixue_user
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - zhixue-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: zhixue-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - zhixue-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  nacos:
+    image: nacos/nacos-server:v2.3.0
+    container_name: zhixue-nacos
+    restart: always
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      NACOS_AUTH_ENABLE: "false"
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 256m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos-data:/home/nacos/logs
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  etcd:
+    image: milvusdb/etcd:v3.5.5
+    container_name: zhixue-etcd
+    restart: always
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "0"
+      ETCD_SNAPSHOT_COUNT: "10000"
+    volumes:
+      - etcd-data:/etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd --snapshot-count 10000 --auto-compaction-retention 1000 --quota-backend-bytes 0
+    networks:
+      - zhixue-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2379/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: zhixue-minio
+    restart: always
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    networks:
+      - zhixue-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  milvus:
+    image: milvusdb/milvus:v2.3.3
+    container_name: zhixue-milvus
+    restart: always
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - milvus-data:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    networks:
+      - zhixue-network
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: zhixue-ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - zhixue-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  zhixue-gateway:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.gateway
+    container_name: zhixue-gateway
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JAVA_OPTS: ${GATEWAY_JAVA_OPTS:--Xms256m -Xmx512m}
+    ports:
+      - "8080:8080"
+    networks:
+      - zhixue-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-user:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.user
+    container_name: zhixue-user
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/zhixue_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      JAVA_OPTS: ${USER_JAVA_OPTS:--Xms256m -Xmx512m}
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-problem:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.problem
+    container_name: zhixue-problem
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/zhixue_problem?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      JAVA_OPTS: ${PROBLEM_JAVA_OPTS:--Xms256m -Xmx512m}
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-learning:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.learning
+    container_name: zhixue-learning
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/zhixue_learning?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      JAVA_OPTS: ${LEARNING_JAVA_OPTS:--Xms256m -Xmx512m}
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-ai:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.ai
+    container_name: zhixue-ai
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/zhixue_ai?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+      MILVUS_HOST: milvus
+      MILVUS_PORT: 19530
+      RAG_FILE_UPLOAD_PATH: /app/uploads/rag-documents
+      JAVA_OPTS: ${AI_JAVA_OPTS:--Xms512m -Xmx1024m}
+    volumes:
+      - rag-uploads:/app/uploads/rag-documents
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-admin:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile.admin
+    container_name: zhixue-admin
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_ADMIN_JDBC_URL: jdbc:mysql://mysql:3306/zhixue_admin?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USER_JDBC_URL: jdbc:mysql://mysql:3306/zhixue_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_PROBLEM_JDBC_URL: jdbc:mysql://mysql:3306/zhixue_problem?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_LEARNING_JDBC_URL: jdbc:mysql://mysql:3306/zhixue_learning?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_USERNAME: nacos
+      SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
+      JAVA_OPTS: ${ADMIN_JAVA_OPTS:--Xms256m -Xmx512m}
+    networks:
+      - zhixue-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zhixue-frontend:
+    build:
+      context: ../
+      dockerfile: docker/frontend/Dockerfile
+    container_name: zhixue-frontend
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - zhixue-network
+    depends_on:
+      zhixue-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  zhixue-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  redis-data:
+  nacos-data:
+  etcd-data:
+  minio-data:
+  milvus-data:
+  ollama-data:
+  rag-uploads:

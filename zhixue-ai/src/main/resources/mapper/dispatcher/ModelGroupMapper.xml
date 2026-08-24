@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueai.dispatcher.mapper.ModelGroupMapper">
+    
+    <resultMap id="ModelGroupResultMap" type="com.rain.zhixueai.dispatcher.entity.ModelGroup">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="modelType" column="model_type"/>
+        <result property="description" column="description"/>
+        <result property="schedulingStrategy" column="scheduling_strategy"
+                typeHandler="com.rain.zhixueai.dispatcher.mapper.handler.SchedulingStrategyTypeHandler"/>
+        <result property="defaultApiKey" column="default_api_key"/>
+        <result property="defaultBaseUrl" column="default_base_url"/>
+        <result property="defaultTimeoutMs" column="default_timeout_ms"/>
+        <result property="defaultMaxRetries" column="default_max_retries"/>
+        <result property="priority" column="priority"/>
+        <result property="enabled" column="enabled"/>
+        <result property="isDefault" column="is_default"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+</mapper>

@@ -1,0 +1,138 @@
+# 应用程序基本配置
+spring:
+  application:
+    name: zhixue-ai  # 应用名称
+  ai:
+    ollama:
+      chat:
+        options:
+          model: qwen2.5-coder:3b-instruct-q5_K_M
+          temperature: 0.7
+      base-url: http://localhost:11434
+  # 数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/zhixue_ai?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true  # 数据库连接地址
+    username: root  # 数据库用户名
+    password: ${MYSQL_PASSWORD:123456} # 数据库密码，生产环境通过环境变量配置
+    driver-class-name: com.mysql.cj.jdbc.Driver  # 数据库驱动类名
+
+    # HikariCP连接池配置
+    hikari:
+      pool-name: HikariCP-Pool  # 连接池名称
+      maximum-pool-size: 20  # 最大连接数
+      minimum-idle: 5  # 最小空闲连接数
+      connection-timeout: 30000  # 连接超时时间(毫秒)
+      idle-timeout: 600000  # 空闲连接超时时间(毫秒)
+      max-lifetime: 1800000  # 连接最大存活时间(毫秒)
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 # Nacos Server地址（集群则写：192.168.1.100:8848,192.168.1.101:8848）
+#        username: nacos # Nacos账号（默认nacos，若修改则对应）
+#        password: nacos # Nacos密码（默认nacos，若修改则对应）
+        # 可选：配置命名空间/分组（用于环境隔离，如dev/test/prod）
+        # namespace: dev-namespace-id # 命名空间ID（Nacos控制台创建后获取）
+        # group: DEFAULT_GROUP # 分组名，默认DEFAULT_GROUP
+  # 文件上传配置
+  servlet:
+    multipart:
+      enabled: true  # 启用文件上传
+      max-file-size: 500MB  # 单个文件最大大小（RAG文档上传）
+      max-request-size: 600MB  # 单次请求最大大小
+      file-size-threshold: 10MB  # 超过此大小的文件写入临时目录
+      location: ${java.io.tmpdir}  # 临时文件存储位置
+#  # JPA配置 (如果使用JPA)
+#  jpa:
+#    hibernate:
+#      ddl-auto: update  # 自动建表策略(create, update, validate, none)
+#    show-sql: true  # 显示SQL语句
+#    properties:
+#      hibernate:
+#        format_sql: true  # 格式化SQL语句
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+# 服务器配置
+server:
+  compression:
+    enabled: false  # 禁用GZIP，否则会破坏SSE流
+  port: 8086  # 服务端口，用户服务使用独立端口
+  servlet:
+    context-path: /  # 应用上下文路径
+
+# 日志配置
+logging:
+  level:
+    com.rain.zhixueuser: debug  # 包日志级别
+    org.springframework: info  # Spring框架日志级别
+    org.hibernate.SQL: debug  # Hibernate SQL日志级别
+    org.apache.fontbox: ERROR  # 抑制字体解析警告
+    org.apache.pdfbox.pdmodel.font: ERROR  # 抑制PDF字体警告
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 控制台日志格式
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # 文件日志格式
+  file:
+    name: logs/zhixue-ai.log  # 日志文件名
+
+# 自定义业务配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml,classpath:mapper/rag/*.xml  # MyBatis映射文件位置
+  type-aliases-package: com.rain.zhixueai.entity  # 实体类包路径
+  configuration:
+    map-underscore-to-camel-case: true # 开启驼峰命名自动映射（核心配置）
+    call-setters-on-nulls: true # 允许为null的字段调用setter方法
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:your-jwt-secret-change-in-production}  # JWT密钥，请在生产环境修改
+  expiration: 86400000  # JWT过期时间(毫秒)，即24小时
+  refreshExpiration: 604800000  # 刷新令牌过期时间(毫秒)，即7天
+
+# Milvus 向量数据库配置
+milvus:
+  host: localhost
+  port: 19530
+  collection-prefix: rag_vectors
+  connect-timeout: 10
+  keep-alive-time: 55
+  keep-alive-timeout: 20
+  secure: false
+  max-retry-attempts: 3
+  health-check-interval-ms: 60000
+
+# RAG功能配置
+rag:
+  file:
+    upload-path: ${RAG_UPLOAD_PATH:./uploads/rag-documents}
+    max-size: 524288000  # 500MB
+    allowed-types: PDF,DOCX,TXT,MD,DOC,HTML,RTF
+  embedding:
+    default-model-id: 1
+    allow-model-switch: true
+    ollama-base-url: http://localhost:11434
+    timeout: 120000
+    default-model: nomic-embed-text:latest
+    parallelism: 2
+    batch-size: 5
+    max-text-length: 10000
+    dimension: 768
+  retrieval:
+    default-top-k: 8
+    default-threshold: 0.5
+    max-context-length: 10000
+    hybrid-alpha: 0.7
+    rerank-enabled: true
+  chunk:
+    size: 1200
+    overlap: 100

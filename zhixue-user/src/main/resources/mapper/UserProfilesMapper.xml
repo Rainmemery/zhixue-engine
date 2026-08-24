@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueuser.mapper.UserProfilesMapper">
+    <update id="updateUserProfiles" parameterType="com.rain.zhixueuser.entity.UserProfiles">
+        UPDATE user_profiles
+        <set>
+            <if test="programmingLanguage != null">programming_language = #{programmingLanguage},</if>
+            <if test="difficultyPreference != null">difficulty_preference = #{difficultyPreference},</if>
+            <if test="dailyGoalMinutes != null">daily_goal_minutes = #{dailyGoalMinutes},</if>
+            <if test="learningStyle != null">learning_style = #{learningStyle},</if>
+            <if test="weeklyLearningDays != null">weekly_learning_days =#{weeklyLearningDays},</if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+    </update>
+    <select id="selectByUserId" resultType="com.rain.zhixueuser.entity.UserProfiles">
+        SELECT user_id,programming_language,difficulty_preference,daily_goal_minutes,learning_style,weekly_learning_days,created_at,updated_at
+        FROM user_profiles
+        WHERE user_id=#{userId}
+    </select>
+</mapper>

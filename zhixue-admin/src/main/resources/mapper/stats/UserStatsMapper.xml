@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.stats.user.UserStatsMapper">
+
+    <select id="countTotalUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM users WHERE deleted_at IS NULL
+    </select>
+
+    <select id="countActiveUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM users 
+        WHERE deleted_at IS NULL 
+        AND last_active_date >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+    </select>
+
+    <select id="countNewUsersToday" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM users 
+        WHERE deleted_at IS NULL 
+        AND DATE(created_at) = CURDATE()
+    </select>
+
+    <select id="countNewUsersByDate" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM users 
+        WHERE deleted_at IS NULL 
+        AND DATE(created_at) = #{date}
+    </select>
+
+    <select id="calculateGrowthRate" resultType="java.lang.Double">
+        SELECT 
+            CASE 
+                WHEN prev_count = 0 THEN 0.0
+                ELSE ROUND(((curr_count - prev_count) * 100.0 / prev_count), 2)
+            END as growth_rate
+        FROM (
+            SELECT 
+                (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL AND DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)) as curr_count,
+                (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL AND DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL #{days} * 2 DAY) AND DATE(created_at) &lt; DATE_SUB(CURDATE(), INTERVAL #{days} DAY)) as prev_count
+        ) as counts
+    </select>
+
+</mapper>

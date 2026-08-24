@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueai.dispatcher.mapper.InstanceHealthStatusMapper">
+    
+    <resultMap id="InstanceHealthStatusResultMap" type="com.rain.zhixueai.dispatcher.entity.InstanceHealthStatus">
+        <id property="id" column="id"/>
+        <result property="instanceId" column="instance_id"/>
+        <result property="healthState" column="health_state" 
+                typeHandler="com.rain.zhixueai.dispatcher.mapper.handler.HealthStateTypeHandler"/>
+        <result property="responseTimeMs" column="response_time_ms"/>
+        <result property="consecutiveFailures" column="consecutive_failures"/>
+        <result property="consecutiveSuccesses" column="consecutive_successes"/>
+        <result property="lastCheckTime" column="last_check_time"/>
+        <result property="lastSuccessTime" column="last_success_time"/>
+        <result property="lastFailureTime" column="last_failure_time"/>
+        <result property="lastErrorMessage" column="last_error_message"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueuser.mapper.UserAchievementMapper">
+    <resultMap id="UserAchievementResultMap" type="com.rain.zhixueuser.entity.UserAchievement">
+        <id property="id" column="ua_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="achievementId" column="achievement_id"/>
+        <result property="progressCurrent" column="progress_current"/>
+        <result property="progressTarget" column="progress_target"/>
+        <result property="unlockedAt" column="unlocked_at"/>
+        <result property="createdAt" column="ua_created_at"/>
+        <result property="updatedAt" column="ua_updated_at"/>
+        <association property="achievement" javaType="com.rain.zhixueuser.entity.Achievements">
+            <id property="id" column="a_id"/>
+            <result property="code" column="code"/>
+            <result property="name" column="name"/>
+            <result property="description" column="description"/>
+            <result property="iconUrl" column="icon_url"/>
+            <result property="category" column="category"/>
+            <result property="rarity" column="rarity"/>
+            <result property="pointsAwarded" column="points_awarded"/>
+            <result property="coinsAwarded" column="coins_awarded"/>
+            <result property="badgeUrl" column="badge_url"/>
+            <result property="conditionType" column="condition_type"/>
+            <result property="conditionConfig" column="condition_config"/>
+            <result property="isActive" column="is_active"/>
+            <result property="createdAt" column="a_created_at"/>
+        </association>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="UserAchievementResultMap">
+        SELECT 
+            ua.id AS ua_id,
+            ua.user_id,
+            ua.achievement_id,
+            ua.progress_current,
+            ua.progress_target,
+            ua.unlocked_at,
+            ua.created_at AS ua_created_at,
+            ua.updated_at AS ua_updated_at,
+            a.id AS a_id,
+            a.code,
+            a.name,
+            a.description,
+            a.icon_url,
+            a.category,
+            a.rarity,
+            a.points_awarded,
+            a.coins_awarded,
+            a.badge_url,
+            a.condition_type,
+            a.condition_config,
+            a.is_active,
+            a.created_at AS a_created_at
+        FROM user_achievements ua
+        LEFT JOIN achievements a ON ua.achievement_id = a.id
+        WHERE ua.user_id = #{userId}
+    </select>
+</mapper>

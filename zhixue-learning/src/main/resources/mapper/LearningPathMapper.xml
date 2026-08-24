@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixuelearning.mapper.LearningPathMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixuelearning.entity.LearningPaths">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="goal" property="goal"/>
+        <result column="total_steps" property="totalSteps"/>
+        <result column="current_step" property="currentStep"/>
+        <result column="status" property="status"/>
+        <result column="progress_percentage" property="progressPercentage"/>
+        <result column="estimated_completion_hours" property="estimatedCompletionHours"/>
+        <result column="actual_completion_hours" property="actualCompletionHours"/>
+        <result column="start_date" property="startDate"/>
+        <result column="target_completion_date" property="targetCompletionDate"/>
+        <result column="actual_completion_date" property="actualCompletionDate"/>
+        <result column="satisfaction_rating" property="satisfactionRating"/>
+        <result column="feedback_text" property="feedbackText"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="target_days" property="targetDays"/>
+        <result column="daily_minutes" property="dailyMinutes"/>
+        <result column="focus_areas" property="focusAreas"/>
+        <result column="progress" property="progress"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, name, description, goal, total_steps, current_step, status,
+        progress_percentage, estimated_completion_hours, actual_completion_hours,
+        start_date, target_completion_date, actual_completion_date,
+        satisfaction_rating, feedback_text, created_at, updated_at,
+        target_days, daily_minutes, focus_areas, progress
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixuelearning.entity.LearningPaths" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_paths (user_id, name, description, goal, total_steps, current_step, status,
+            progress_percentage, estimated_completion_hours, actual_completion_hours,
+            start_date, target_completion_date, actual_completion_date,
+            satisfaction_rating, feedback_text, created_at, updated_at,
+            target_days, daily_minutes, focus_areas, progress)
+        VALUES (#{userId}, #{name}, #{description}, #{goal}, #{totalSteps}, #{currentStep}, #{status},
+            #{progressPercentage}, #{estimatedCompletionHours}, #{actualCompletionHours},
+            #{startDate}, #{targetCompletionDate}, #{actualCompletionDate},
+            #{satisfactionRating}, #{feedbackText}, NOW(), NOW(),
+            #{targetDays}, #{dailyMinutes}, #{focusAreas}, #{progress})
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixuelearning.entity.LearningPaths">
+        UPDATE learning_paths
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="goal != null">goal = #{goal},</if>
+            <if test="totalSteps != null">total_steps = #{totalSteps},</if>
+            <if test="currentStep != null">current_step = #{currentStep},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="progressPercentage != null">progress_percentage = #{progressPercentage},</if>
+            <if test="estimatedCompletionHours != null">estimated_completion_hours = #{estimatedCompletionHours},</if>
+            <if test="actualCompletionHours != null">actual_completion_hours = #{actualCompletionHours},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="targetCompletionDate != null">target_completion_date = #{targetCompletionDate},</if>
+            <if test="actualCompletionDate != null">actual_completion_date = #{actualCompletionDate},</if>
+            <if test="satisfactionRating != null">satisfaction_rating = #{satisfactionRating},</if>
+            <if test="feedbackText != null">feedback_text = #{feedbackText},</if>
+            <if test="targetDays != null">target_days = #{targetDays},</if>
+            <if test="dailyMinutes != null">daily_minutes = #{dailyMinutes},</if>
+            <if test="focusAreas != null">focus_areas = #{focusAreas},</if>
+            <if test="progress != null">progress = #{progress},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_paths
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_paths
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_paths
+        WHERE status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectRecommended" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_paths
+        WHERE status = 'recommended' OR user_id = 0
+        ORDER BY created_at DESC
+        LIMIT 10
+    </select>
+
+</mapper>

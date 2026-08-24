@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueJudgeTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueJudgeTask">
+        <id column="id" property="id"/>
+        <result column="submission_id" property="submissionId"/>
+        <result column="status" property="status"/>
+        <result column="priority" property="priority"/>
+        <result column="retry_count" property="retryCount"/>
+        <result column="max_retry" property="maxRetry"/>
+        <result column="worker_id" property="workerId"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="completed_at" property="completedAt"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, submission_id, status, priority, retry_count, max_retry, worker_id,
+        started_at, completed_at, error_message, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueJudgeTask" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_judge_task (submission_id, status, priority, retry_count, max_retry, created_at)
+        VALUES (#{submissionId}, #{status}, #{priority}, #{retryCount}, #{maxRetry}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueJudgeTask">
+        UPDATE zhixue_judge_task
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            <if test="workerId != null">worker_id = #{workerId},</if>
+            <if test="startedAt != null">started_at = #{startedAt},</if>
+            <if test="completedAt != null">completed_at = #{completedAt},</if>
+            <if test="errorMessage != null">error_message = #{errorMessage},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_judge_task
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectBySubmissionId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_judge_task
+        WHERE submission_id = #{submissionId}
+    </select>
+
+</mapper>

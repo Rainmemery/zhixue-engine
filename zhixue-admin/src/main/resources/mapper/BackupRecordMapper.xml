@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.BackupRecordMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueadmin.entity.BackupRecord">
+        <id column="id" property="id"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="backup_type" property="backupType"/>
+        <result column="status" property="status"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="download_url" property="downloadUrl"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, file_name, file_size, backup_type, status, start_time, end_time, created_by, download_url
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueadmin.entity.BackupRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO backup_records (file_name, file_size, backup_type, status, start_time, end_time, created_by, download_url)
+        VALUES (#{fileName}, #{fileSize}, #{backupType}, #{status}, #{startTime}, #{endTime}, #{createdBy}, #{downloadUrl})
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueadmin.entity.BackupRecord">
+        UPDATE backup_records
+        <set>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="backupType != null">backup_type = #{backupType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="downloadUrl != null">download_url = #{downloadUrl},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM backup_records WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM backup_records
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM backup_records
+        ORDER BY start_time DESC
+    </select>
+
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM backup_records
+        <where>
+            <if test="type != null and type != ''">
+                backup_type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY start_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM backup_records
+        <where>
+            <if test="type != null and type != ''">
+                backup_type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

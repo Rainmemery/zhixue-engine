@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueProblemTestcaseMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueProblemTestcase">
+        <id column="id" property="id"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="testcase_name" property="testcaseName"/>
+        <result column="input_file_path" property="inputFilePath"/>
+        <result column="output_file_path" property="outputFilePath"/>
+        <result column="input_file_size" property="inputFileSize"/>
+        <result column="output_file_size" property="outputFileSize"/>
+        <result column="time_limit_ms" property="timeLimitMs"/>
+        <result column="memory_limit_mb" property="memoryLimitMb"/>
+        <result column="is_sample" property="isSample"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, problem_id, testcase_name, input_file_path, output_file_path, input_file_size, output_file_size, time_limit_ms, memory_limit_mb, is_sample, sort_order, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemTestcase" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_problem_testcase (problem_id, testcase_name, input_file_path, output_file_path, input_file_size, output_file_size, time_limit_ms, memory_limit_mb, is_sample, sort_order, created_at)
+        VALUES (#{problemId}, #{testcaseName}, #{inputFilePath}, #{outputFilePath}, #{inputFileSize}, #{outputFileSize}, #{timeLimitMs}, #{memoryLimitMb}, #{isSample}, #{sortOrder}, NOW())
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM zhixue_problem_testcase WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByProblemId">
+        DELETE FROM zhixue_problem_testcase WHERE problem_id = #{problemId}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_testcase
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByProblemId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem_testcase
+        WHERE problem_id = #{problemId}
+        ORDER BY sort_order ASC
+    </select>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueProblemTestcase">
+        UPDATE zhixue_problem_testcase
+        <set>
+            <if test="testcaseName != null">testcase_name = #{testcaseName},</if>
+            <if test="inputFilePath != null">input_file_path = #{inputFilePath},</if>
+            <if test="outputFilePath != null">output_file_path = #{outputFilePath},</if>
+            <if test="inputFileSize != null">input_file_size = #{inputFileSize},</if>
+            <if test="outputFileSize != null">output_file_size = #{outputFileSize},</if>
+            <if test="timeLimitMs != null">time_limit_ms = #{timeLimitMs},</if>
+            <if test="memoryLimitMb != null">memory_limit_mb = #{memoryLimitMb},</if>
+            <if test="isSample != null">is_sample = #{isSample},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO zhixue_problem_testcase (problem_id, testcase_name, input_file_path, output_file_path, input_file_size, output_file_size, time_limit_ms, memory_limit_mb, is_sample, sort_order, created_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.problemId}, #{item.testcaseName}, #{item.inputFilePath}, #{item.outputFilePath}, #{item.inputFileSize}, #{item.outputFileSize}, #{item.timeLimitMs}, #{item.memoryLimitMb}, #{item.isSample}, #{item.sortOrder}, NOW())
+        </foreach>
+    </insert>
+
+    <select id="countByProblemId" resultType="int">
+        SELECT COUNT(*) FROM zhixue_problem_testcase WHERE problem_id = #{problemId}
+    </select>
+
+</mapper>

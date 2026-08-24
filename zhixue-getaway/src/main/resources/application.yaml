@@ -1,0 +1,191 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: zhixue-gateway
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+#        username: nacos
+#        password: nacos
+    gateway:
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 60s
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: ai-admin-service-route
+          uri: lb://zhixue-ai
+          predicates:
+            - Path=/api/v1/admin/ai-model/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: intelligent-scheduling-route
+          uri: lb://zhixue-ai
+          predicates:
+            - Path=/api/v1/scheduling/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: dispatcher-service-route
+          uri: lb://zhixue-ai
+          predicates:
+            - Path=/api/v1/dispatcher/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: rag-service-route
+          uri: lb://zhixue-ai
+          predicates:
+            - Path=/api/v1/rag/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: user-service-route
+          uri: lb://zhixue-user
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/users/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: admin-user-service-route
+          uri: lb://zhixue-admin
+          predicates:
+            - Path=/api/v1/admin/admin-users/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: admin-platform-user-route
+          uri: lb://zhixue-user
+          predicates:
+            - Path=/api/v1/admin/users/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: learning-service-route
+          uri: lb://zhixue-learning
+          predicates:
+            - Path=/api/v1/learning/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: ai-service-route
+          uri: lb://zhixue-ai
+          predicates:
+            - Path=/api/v1/ai/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: admin-problem-service-route
+          uri: lb://zhixue-problem
+          predicates:
+            - Path=/api/v1/admin/problems/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: admin-service-route
+          uri: lb://zhixue-admin
+          predicates:
+            - Path=/api/v1/admin/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: problem-websocket-route
+          uri: lb:ws://zhixue-problem
+          predicates:
+            - Path=/ws/**
+            - Header=Upgrade, (?i)websocket
+
+        - id: problem-websocket-http-route
+          uri: lb://zhixue-problem
+          predicates:
+            - Path=/ws/**
+
+        - id: problem-service-route
+          uri: lb://zhixue-problem
+          predicates:
+            - Path=/api/v1/problems/**,/api/v1/submissions/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                key-resolver: "#{@ipKeyResolver}"
+
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  health:
+    redis:
+      enabled: false

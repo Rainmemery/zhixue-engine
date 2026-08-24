@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixuelearning.mapper.LearningPathStepMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixuelearning.entity.LearningPathSteps">
+        <id column="id" property="id"/>
+        <result column="learning_path_id" property="learningPathId"/>
+        <result column="step_number" property="stepNumber"/>
+        <result column="step_type" property="stepType"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="knowledge_point_id" property="knowledgePointId"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="prerequisites" property="prerequisites"/>
+        <result column="estimated_time_minutes" property="estimatedTimeMinutes"/>
+        <result column="actual_duration_minutes" property="actualDurationMinutes"/>
+        <result column="status" property="status"/>
+        <result column="completed_at" property="completedAt"/>
+        <result column="score" property="score"/>
+        <result column="feedback" property="feedback"/>
+        <result column="resources" property="resources"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, learning_path_id, step_number, step_type, problem_id, knowledge_point_id,
+        title, description, prerequisites, estimated_time_minutes, actual_duration_minutes,
+        status, completed_at, score, feedback, resources, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixuelearning.entity.LearningPathSteps" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_path_steps (learning_path_id, step_number, step_type, problem_id, knowledge_point_id,
+            title, description, prerequisites, estimated_time_minutes, actual_duration_minutes,
+            status, completed_at, score, feedback, resources, created_at)
+        VALUES (#{learningPathId}, #{stepNumber}, #{stepType}, #{problemId}, #{knowledgePointId},
+            #{title}, #{description}, #{prerequisites}, #{estimatedTimeMinutes}, #{actualDurationMinutes},
+            #{status}, #{completedAt}, #{score}, #{feedback}, #{resources}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixuelearning.entity.LearningPathSteps">
+        UPDATE learning_path_steps
+        <set>
+            <if test="stepNumber != null">step_number = #{stepNumber},</if>
+            <if test="stepType != null">step_type = #{stepType},</if>
+            <if test="problemId != null">problem_id = #{problemId},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="estimatedTimeMinutes != null">estimated_time_minutes = #{estimatedTimeMinutes},</if>
+            <if test="actualDurationMinutes != null">actual_duration_minutes = #{actualDurationMinutes},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="completedAt != null">completed_at = #{completedAt},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="feedback != null">feedback = #{feedback},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_path_steps
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPathId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM learning_path_steps
+        WHERE learning_path_id = #{pathId}
+        ORDER BY step_number ASC
+    </select>
+
+</mapper>

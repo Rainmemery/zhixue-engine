@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: zhixue-admin-test
+  datasource:
+    admin:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    user:
+      url: jdbc:h2:mem:testdb_user;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    problem:
+      url: jdbc:h2:mem:testdb_problem;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+    learning:
+      url: jdbc:h2:mem:testdb_learning;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      username: sa
+      password: 
+      driver-class-name: org.h2.Driver
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
+
+server:
+  port: 0
+
+logging:
+  level:
+    com.rain.zhixueadmin: debug
+    org.springframework: info
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.rain.zhixueadmin.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  secret: testSecretKeyForTesting
+  expiration: 86400000
+  refreshExpiration: 604800000

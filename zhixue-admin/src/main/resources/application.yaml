@@ -1,0 +1,100 @@
+# 应用程序基本配置
+spring:
+  application:
+    name: zhixue-admin  # 应用名称
+  # 多数据源配置
+  datasource:
+    admin:
+      jdbc-url: jdbc:mysql://localhost:3306/zhixue_admin?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      username: root
+      password: ${MYSQL_PASSWORD:123456}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: Admin-HikariCP-Pool
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    user:
+      jdbc-url: jdbc:mysql://localhost:3306/zhixue_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      username: root
+      password: ${MYSQL_PASSWORD:123456}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: User-HikariCP-Pool
+        maximum-pool-size: 10
+        minimum-idle: 2
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    problem:
+      jdbc-url: jdbc:mysql://localhost:3306/zhixue_problem?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      username: root
+      password: ${MYSQL_PASSWORD:123456}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: Problem-HikariCP-Pool
+        maximum-pool-size: 10
+        minimum-idle: 2
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+    learning:
+      jdbc-url: jdbc:mysql://localhost:3306/zhixue_learning?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+      username: root
+      password: ${MYSQL_PASSWORD:123456}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: Learning-HikariCP-Pool
+        maximum-pool-size: 10
+        minimum-idle: 2
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+#        username: nacos
+#        password: nacos
+
+# 服务器配置
+server:
+  compression:
+    enabled: false  # 禁用GZIP，否则会破坏SSE流
+  port: 8090  # 服务端口
+  servlet:
+    context-path: /  # 应用上下文路径
+
+# 日志配置
+logging:
+  level:
+    com.rain.zhixueadmin: debug
+    org.springframework: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/zhixue-admin.log
+
+# 自定义业务配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.rain.zhixueadmin.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:your-jwt-secret-change-in-production}  # JWT密钥，请在生产环境修改
+  expiration: 86400000
+  refreshExpiration: 604800000
+
+# 文件上传配置
+servlet:
+  multipart:
+    enabled: true
+    max-file-size: 10MB
+    max-request-size: 50MB

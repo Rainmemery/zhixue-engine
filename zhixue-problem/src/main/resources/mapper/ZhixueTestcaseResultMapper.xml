@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueTestcaseResultMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueTestcaseResult">
+        <id column="id" property="id"/>
+        <result column="submission_id" property="submissionId"/>
+        <result column="testcase_id" property="testcaseId"/>
+        <result column="testcase_name" property="testcaseName"/>
+        <result column="status" property="status"/>
+        <result column="execution_time_ms" property="executionTimeMs"/>
+        <result column="memory_used_kb" property="memoryUsedKb"/>
+        <result column="actual_output" property="actualOutput"/>
+        <result column="error_output" property="errorMessage"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, submission_id, testcase_id, testcase_name, status, execution_time_ms, memory_used_kb, actual_output, error_output, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueTestcaseResult" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_testcase_result (submission_id, testcase_id, testcase_name, status, execution_time_ms,
+            memory_used_kb, actual_output, error_output, created_at)
+        VALUES (#{submissionId}, #{testcaseId}, #{testcaseName}, #{status}, #{executionTimeMs},
+            #{memoryUsedKb}, #{actualOutput}, #{errorMessage}, NOW())
+    </insert>
+
+    <select id="selectBySubmissionId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_testcase_result
+        WHERE submission_id = #{submissionId}
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO zhixue_testcase_result (submission_id, testcase_id, testcase_name, status, execution_time_ms,
+            memory_used_kb, actual_output, error_output, created_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.submissionId}, #{item.testcaseId}, #{item.testcaseName}, #{item.status}, #{item.executionTimeMs},
+            #{item.memoryUsedKb}, #{item.actualOutput}, #{item.errorMessage}, NOW())
+        </foreach>
+    </insert>
+
+</mapper>

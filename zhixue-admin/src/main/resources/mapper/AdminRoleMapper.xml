@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.AdminRoleMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueadmin.entity.AdminRole">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="permissions" property="permissions"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, description, permissions, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueadmin.entity.AdminRole" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_roles (name, description, permissions, created_at)
+        VALUES (#{name}, #{description}, #{permissions}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueadmin.entity.AdminRole">
+        UPDATE admin_roles
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="permissions != null">permissions = #{permissions},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM admin_roles WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_roles
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_roles
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_roles
+        <where>
+            <if test="search != null and search != ''">
+                (name LIKE CONCAT('%', #{search}, '%') OR description LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM admin_roles
+        <where>
+            <if test="search != null and search != ''">
+                (name LIKE CONCAT('%', #{search}, '%') OR description LIKE CONCAT('%', #{search}, '%'))
+            </if>
+        </where>
+    </select>
+
+</mapper>

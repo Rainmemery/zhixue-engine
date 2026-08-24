@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueai.mapper.rag.RagDocumentMapper">
+    
+    <resultMap id="RagDocumentResultMap" type="com.rain.zhixueai.entity.rag.RagDocument">
+        <id property="id" column="id"/>
+        <result property="knowledgeBaseId" column="knowledge_base_id"/>
+        <result property="title" column="title"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileType" column="file_type"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="filePath" column="file_path"/>
+        <result property="chunkCount" column="chunk_count"/>
+        <result property="status" column="status"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+    
+    <select id="findByKnowledgeBaseId" resultMap="RagDocumentResultMap">
+        SELECT * FROM rag_document WHERE knowledge_base_id = #{knowledgeBaseId} ORDER BY created_at DESC
+    </select>
+    
+    <select id="findByKnowledgeBaseIdWithPaging" resultMap="RagDocumentResultMap">
+        SELECT * FROM rag_document WHERE knowledge_base_id = #{knowledgeBaseId} 
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <select id="countByKnowledgeBaseId" resultType="int">
+        SELECT COUNT(*) FROM rag_document WHERE knowledge_base_id = #{knowledgeBaseId}
+    </select>
+    
+    <select id="findById" resultMap="RagDocumentResultMap">
+        SELECT * FROM rag_document WHERE id = #{id}
+    </select>
+    
+    <select id="findByStatus" resultMap="RagDocumentResultMap">
+        SELECT * FROM rag_document WHERE status = #{status}
+    </select>
+    
+    <insert id="insert" parameterType="com.rain.zhixueai.entity.rag.RagDocument" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO rag_document (
+            knowledge_base_id, title, file_name, file_type, 
+            file_size, file_path, chunk_count, status, 
+            error_message, created_by, created_at, updated_at
+        ) VALUES (
+            #{knowledgeBaseId}, #{title}, #{fileName}, #{fileType},
+            #{fileSize}, #{filePath}, #{chunkCount}, #{status},
+            #{errorMessage}, #{createdBy}, NOW(), NOW()
+        )
+    </insert>
+    
+    <update id="update" parameterType="com.rain.zhixueai.entity.rag.RagDocument">
+        UPDATE rag_document SET
+            knowledge_base_id = #{knowledgeBaseId},
+            title = #{title},
+            file_name = #{fileName},
+            file_type = #{fileType},
+            file_size = #{fileSize},
+            file_path = #{filePath},
+            chunk_count = #{chunkCount},
+            status = #{status},
+            error_message = #{errorMessage},
+            created_by = #{createdBy},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM rag_document WHERE id = #{id}
+    </delete>
+    
+    <delete id="deleteByKnowledgeBaseId">
+        DELETE FROM rag_document WHERE knowledge_base_id = #{knowledgeBaseId}
+    </delete>
+    
+    <update id="updateStatus">
+        UPDATE rag_document SET status = #{status}, 
+        <if test="errorMessage != null">
+            error_message = #{errorMessage},
+        </if>
+        updated_at = NOW() WHERE id = #{id}
+    </update>
+    
+    <update id="incrementChunkCount">
+        UPDATE rag_document SET chunk_count = chunk_count + #{count}, updated_at = NOW() WHERE id = #{id}
+    </update>
+</mapper>

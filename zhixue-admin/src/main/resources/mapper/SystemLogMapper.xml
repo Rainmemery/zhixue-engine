@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.SystemLogMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueadmin.entity.SystemLog">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="action" property="action"/>
+        <result column="resource" property="resource"/>
+        <result column="status" property="status"/>
+        <result column="ip_address" property="ipAddress"/>
+        <result column="user_agent" property="userAgent"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="details" property="details"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, username, action, resource, status, ip_address, user_agent, created_at, details
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueadmin.entity.SystemLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO system_logs (user_id, username, action, resource, status, ip_address, user_agent, created_at, details)
+        VALUES (#{userId}, #{username}, #{action}, #{resource}, #{status}, #{ipAddress}, #{userAgent}, NOW(), #{details})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM system_logs
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM system_logs
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="action != null and action != ''">
+                AND action = #{action}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="startTime != null">
+                AND created_at >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND created_at &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(*)
+        FROM system_logs
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="action != null and action != ''">
+                AND action = #{action}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="startTime != null">
+                AND created_at >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND created_at &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+</mapper>

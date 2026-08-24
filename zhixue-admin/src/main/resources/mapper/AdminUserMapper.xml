@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueadmin.mapper.AdminUserMapper">
+    
+    <resultMap id="BaseResultMap" type="com.rain.zhixueadmin.entity.AdminUser">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="role_id" property="roleId"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="last_login" property="lastLogin"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username, email, role_id, status, created_at, last_login
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueadmin.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_users (username, email, role_id, status, created_at, last_login)
+        VALUES (#{username}, #{email}, #{roleId}, #{status}, NOW(), #{lastLogin})
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueadmin.entity.AdminUser">
+        UPDATE admin_users
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="lastLogin != null">last_login = #{lastLogin},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM admin_users WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_users
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_users
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM admin_users
+        <where>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="roleId != null">
+                AND role_id = #{roleId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(*)
+        FROM admin_users
+        <where>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="roleId != null">
+                AND role_id = #{roleId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <delete id="batchDelete">
+        DELETE FROM admin_users WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

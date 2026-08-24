@@ -1,0 +1,378 @@
+/* RAG 管理页面响应式样式 */
+
+/* 基础样式 */
+.rag-management-page {
+  min-height: 100vh;
+}
+
+/* 移动端适配 (< 640px) */
+@media (max-width: 639px) {
+  .rag-management-page {
+    padding: 8px !important;
+  }
+
+  .page-header {
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .tabs-container {
+    border-radius: 12px !important;
+  }
+
+  .custom-tabs-header {
+    padding: 4px 4px 0 !important;
+  }
+
+  .tab-button {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    min-width: 70px !important;
+  }
+
+  .tab-button span:not(.tab-indicator) {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tab-content {
+    padding: 8px !important;
+    min-height: 300px !important;
+  }
+
+  .tab-content .ant-card {
+    border-radius: 12px !important;
+  }
+
+  /* 统计卡片 */
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 20px !important;
+  }
+
+  /* 表格 */
+  .ant-table {
+    font-size: 12px !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px !important;
+  }
+
+  /* 表单 */
+  .ant-form-item-label {
+    padding-bottom: 4px !important;
+  }
+
+  .ant-form-item {
+    margin-bottom: 12px !important;
+  }
+
+  /* 模态框 */
+  .ant-modal {
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+  }
+
+  .ant-modal-body {
+    padding: 12px !important;
+  }
+
+  .ant-modal-header {
+    padding: 12px 16px !important;
+  }
+
+  .ant-modal-footer {
+    padding: 12px 16px !important;
+  }
+
+  /* 卡片 */
+  .ant-card-head {
+    padding: 0 12px !important;
+    min-height: 44px !important;
+  }
+
+  .ant-card-head-title {
+    font-size: 14px !important;
+  }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+
+  /* 隐藏小屏幕上的元素 */
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+/* 小屏幕到平板 (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  .rag-management-page {
+    padding: 12px !important;
+  }
+
+  .page-header {
+    padding: 16px 20px !important;
+  }
+
+  .tab-button {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .tab-content {
+    padding: 12px !important;
+  }
+}
+
+/* 平板适配 (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .rag-management-page {
+    padding: 16px !important;
+  }
+
+  .page-header {
+    padding: 20px 24px !important;
+  }
+
+  .tab-content {
+    padding: 16px !important;
+  }
+
+  .ant-statistic {
+    margin-bottom: 12px;
+  }
+
+  .ant-table {
+    font-size: 13px !important;
+  }
+}
+
+/* 桌面端适配 (>= 1024px) */
+@media (min-width: 1024px) {
+  .rag-management-page {
+    padding: 24px !important;
+  }
+
+  .page-header {
+    padding: 24px 32px !important;
+  }
+
+  .tab-content {
+    padding: 24px !important;
+    min-height: 500px !important;
+  }
+
+  .ant-statistic {
+    margin-bottom: 0;
+  }
+}
+
+/* 大屏幕 (>= 1280px) */
+@media (min-width: 1280px) {
+  .tab-button {
+    padding: 12px 24px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* 表格响应式优化 */
+.ant-table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .ant-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  .ant-btn-sm {
+    min-height: 32px;
+  }
+
+  .ant-switch {
+    min-height: 22px;
+    min-width: 44px;
+  }
+
+  .ant-select-selector {
+    min-height: 40px !important;
+  }
+
+  .ant-input-affix-wrapper {
+    min-height: 40px;
+  }
+
+  .ant-input {
+    min-height: 40px;
+  }
+
+  /* 增大点击区域 */
+  .ant-table-tbody > tr > td .ant-btn {
+    padding: 4px 8px;
+  }
+
+  .ant-pagination-item,
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* 卡片响应式布局 */
+.rag-config-card .ant-card {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 767px) {
+  .rag-config-card .ant-card {
+    margin-bottom: 12px;
+  }
+}
+
+/* 动画优化 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rag-config-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 加载状态优化 */
+.ant-spin-nested-loading {
+  min-height: 200px;
+}
+
+/* 统计卡片响应式 */
+.ant-statistic-card {
+  transition: transform 0.2s;
+}
+
+.ant-statistic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 表格行悬停效果 */
+.ant-table-tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* 滚动条样式优化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 移动端滚动条更细 */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .rag-config-card .ant-card {
+    background-color: #1f1f1f;
+    border-color: #303030;
+  }
+
+  .rag-config-card .ant-card-head {
+    background-color: #1f1f1f;
+    border-bottom-color: #303030;
+  }
+
+  .rag-config-card .bg-gray-50 {
+    background-color: #262626 !important;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .rag-config-card .ant-btn,
+  .custom-tabs-header,
+  .page-header {
+    display: none;
+  }
+
+  .rag-config-card .ant-card {
+    break-inside: avoid;
+  }
+
+  .tabs-container {
+    box-shadow: none !important;
+  }
+}
+
+/* Flex 布局工具类 */
+@media (max-width: 767px) {
+  .flex-col-mobile {
+    flex-direction: column !important;
+  }
+
+  .flex-wrap-mobile {
+    flex-wrap: wrap !important;
+  }
+
+  .w-full-mobile {
+    width: 100% !important;
+  }
+
+  .text-center-mobile {
+    text-align: center !important;
+  }
+}
+
+/* 间距工具类 */
+@media (max-width: 767px) {
+  .gap-2-mobile {
+    gap: 8px !important;
+  }
+
+  .gap-3-mobile {
+    gap: 12px !important;
+  }
+
+  .p-0-mobile {
+    padding: 0 !important;
+  }
+
+  .m-0-mobile {
+    margin: 0 !important;
+  }
+}

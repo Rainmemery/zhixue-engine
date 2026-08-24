@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueProblemMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueProblem">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="title_en" property="titleEn"/>
+        <result column="description" property="description"/>
+        <result column="input_description" property="inputDescription"/>
+        <result column="output_description" property="outputDescription"/>
+        <result column="hint" property="hint"/>
+        <result column="source" property="source"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="problem_type" property="problemType"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="time_limit_ms" property="timeLimitMs"/>
+        <result column="memory_limit_mb" property="memoryLimitMb"/>
+        <result column="template_code" property="templateCode"/>
+        <result column="solution_code" property="solutionCode"/>
+        <result column="is_public" property="isPublic"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="submit_count" property="submitCount"/>
+        <result column="accepted_count" property="acceptedCount"/>
+        <result column="acceptance_rate" property="acceptanceRate"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted_at" property="deletedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, title, title_en, description, input_description, output_description, hint, source,
+        difficulty, problem_type, category_id, time_limit_ms, memory_limit_mb,
+        template_code, solution_code, is_public, view_count, submit_count, accepted_count,
+        acceptance_rate, sort_order, created_by, created_at, updated_at, deleted_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueProblem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_problem
+        <set>
+            title = #{title},
+            <if test="titleEn != null">title_en = #{titleEn},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="inputDescription != null">input_description = #{inputDescription},</if>
+            <if test="outputDescription != null">output_description = #{outputDescription},</if>
+            <if test="hint != null">hint = #{hint},</if>
+            <if test="source != null">source = #{source},</if>
+            difficulty = #{difficulty},
+            problem_type = #{problemType},
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="timeLimitMs != null">time_limit_ms = #{timeLimitMs},</if>
+            <if test="memoryLimitMb != null">memory_limit_mb = #{memoryLimitMb},</if>
+            <if test="templateCode != null">template_code = #{templateCode},</if>
+            <if test="solutionCode != null">solution_code = #{solutionCode},</if>
+            <if test="isPublic != null">is_public = #{isPublic},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            created_at = NOW(),
+            updated_at = NOW(),
+        </set>
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueProblem">
+        UPDATE zhixue_problem
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="titleEn != null">title_en = #{titleEn},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="inputDescription != null">input_description = #{inputDescription},</if>
+            <if test="outputDescription != null">output_description = #{outputDescription},</if>
+            <if test="hint != null">hint = #{hint},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="difficulty != null">difficulty = #{difficulty},</if>
+            <if test="problemType != null">problem_type = #{problemType},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="timeLimitMs != null">time_limit_ms = #{timeLimitMs},</if>
+            <if test="memoryLimitMb != null">memory_limit_mb = #{memoryLimitMb},</if>
+            <if test="templateCode != null">template_code = #{templateCode},</if>
+            <if test="solutionCode != null">solution_code = #{solutionCode},</if>
+            <if test="isPublic != null">is_public = #{isPublic},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="submitCount != null">submit_count = #{submitCount},</if>
+            <if test="acceptedCount != null">accepted_count = #{acceptedCount},</if>
+            <if test="acceptanceRate != null">acceptance_rate = #{acceptanceRate},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="deletedAt != null">deleted_at = #{deletedAt},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM zhixue_problem WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_problem
+        WHERE id = #{id} AND deleted_at IS NULL
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT p.id, p.title, p.title_en, p.description, p.input_description, p.output_description,
+            p.hint, p.source, p.difficulty, p.problem_type, p.category_id,
+            p.time_limit_ms, p.memory_limit_mb, p.template_code, p.solution_code,
+            p.is_public, p.view_count, p.submit_count, p.accepted_count,
+            p.acceptance_rate, p.sort_order, p.created_by, p.created_at, p.updated_at, p.deleted_at
+        FROM zhixue_problem p
+        <if test="tagId != null">
+            INNER JOIN zhixue_problem_tag_rel ptr ON p.id = ptr.problem_id
+        </if>
+        <where>
+            p.deleted_at IS NULL
+            <if test="isPublic != null">
+                AND p.is_public = #{isPublic}
+            </if>
+            <if test="difficulty != null and difficulty != ''">
+                AND p.difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="search != null and search != ''">
+                AND p.title LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="tagId != null">
+                AND ptr.tag_id = #{tagId}
+            </if>
+            <if test="problemType != null and problemType != ''">
+                AND p.problem_type = #{problemType}
+            </if>
+        </where>
+        <choose>
+            <when test="sort == 'most_submitted'">
+                ORDER BY p.submit_count DESC
+            </when>
+            <when test="sort == 'highest_rate'">
+                ORDER BY p.acceptance_rate DESC
+            </when>
+            <otherwise>
+                ORDER BY p.created_at DESC
+            </otherwise>
+        </choose>
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(DISTINCT p.id)
+        FROM zhixue_problem p
+        <if test="tagId != null">
+            INNER JOIN zhixue_problem_tag_rel ptr ON p.id = ptr.problem_id
+        </if>
+        <where>
+            p.deleted_at IS NULL
+            <if test="isPublic != null">
+                AND p.is_public = #{isPublic}
+            </if>
+            <if test="difficulty != null and difficulty != ''">
+                AND p.difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="search != null and search != ''">
+                AND p.title LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="tagId != null">
+                AND ptr.tag_id = #{tagId}
+            </if>
+            <if test="problemType != null and problemType != ''">
+                AND p.problem_type = #{problemType}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAdminList" resultMap="BaseResultMap">
+        SELECT p.id, p.title, p.title_en, p.description, p.input_description, p.output_description,
+            p.hint, p.source, p.difficulty, p.problem_type, p.category_id,
+            p.time_limit_ms, p.memory_limit_mb, p.template_code, p.solution_code,
+            p.is_public, p.view_count, p.submit_count, p.accepted_count,
+            p.acceptance_rate, p.sort_order, p.created_by, p.created_at, p.updated_at, p.deleted_at
+        FROM zhixue_problem p
+        <where>
+            p.deleted_at IS NULL
+            <if test="difficulty != null and difficulty != ''">
+                AND p.difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="search != null and search != ''">
+                AND p.title LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="problemType != null and problemType != ''">
+                AND p.problem_type = #{problemType}
+            </if>
+            <if test="isPublic != null">
+                AND p.is_public = #{isPublic}
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countAdminList" resultType="int">
+        SELECT COUNT(*)
+        FROM zhixue_problem p
+        <where>
+            p.deleted_at IS NULL
+            <if test="difficulty != null and difficulty != ''">
+                AND p.difficulty = #{difficulty}
+            </if>
+            <if test="categoryId != null">
+                AND p.category_id = #{categoryId}
+            </if>
+            <if test="search != null and search != ''">
+                AND p.title LIKE CONCAT('%', #{search}, '%')
+            </if>
+            <if test="problemType != null and problemType != ''">
+                AND p.problem_type = #{problemType}
+            </if>
+            <if test="isPublic != null">
+                AND p.is_public = #{isPublic}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateAcceptanceRate">
+        UPDATE zhixue_problem SET acceptance_rate = #{rate}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="incrementSubmitCount">
+        UPDATE zhixue_problem SET submit_count = submit_count + 1, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="incrementAcceptedCount">
+        UPDATE zhixue_problem SET accepted_count = accepted_count + 1, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+</mapper>

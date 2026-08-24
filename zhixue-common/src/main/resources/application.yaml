@@ -1,0 +1,15 @@
+# 应用程序基本配置
+spring:
+  application:
+    name: zhixue-common  # 应用名称
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET:your-jwt-secret-change-in-production}  # JWT密钥，请在生产环境修改
+  expiration: 86400000  # JWT过期时间(毫秒)，即24小时
+  refreshExpiration: 604800000  # 刷新令牌过期时间(毫秒)，即7天
+
+#server:
+#  port: 5560  # 服务端口，用户服务使用独立端口
+#  servlet:
+#    context-path: /  # 应用上下文路径

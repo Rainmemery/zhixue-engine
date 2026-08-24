@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueUserProblemStatusMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueUserProblemStatus">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="status" property="status"/>
+        <result column="best_submission_id" property="bestSubmissionId"/>
+        <result column="best_time_ms" property="bestTimeMs"/>
+        <result column="best_memory_kb" property="bestMemoryKb"/>
+        <result column="attempt_count" property="attemptCount"/>
+        <result column="accepted_at" property="acceptedAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, problem_id, status, best_submission_id, best_time_ms, best_memory_kb,
+        attempt_count, accepted_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueUserProblemStatus" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_user_problem_status (user_id, problem_id, status, best_submission_id,
+            best_time_ms, best_memory_kb, attempt_count, accepted_at, updated_at)
+        VALUES (#{userId}, #{problemId}, #{status}, #{bestSubmissionId},
+            #{bestTimeMs}, #{bestMemoryKb}, #{attemptCount}, #{acceptedAt}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueUserProblemStatus">
+        UPDATE zhixue_user_problem_status
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="bestSubmissionId != null">best_submission_id = #{bestSubmissionId},</if>
+            <if test="bestTimeMs != null">best_time_ms = #{bestTimeMs},</if>
+            <if test="bestMemoryKb != null">best_memory_kb = #{bestMemoryKb},</if>
+            <if test="attemptCount != null">attempt_count = #{attemptCount},</if>
+            <if test="acceptedAt != null">accepted_at = #{acceptedAt},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByUserIdAndProblemId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_user_problem_status
+        WHERE user_id = #{userId} AND problem_id = #{problemId}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_user_problem_status
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectByProblemId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_user_problem_status
+        WHERE problem_id = #{problemId}
+    </select>
+
+</mapper>

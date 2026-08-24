@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rain.zhixueproblem.mapper.ZhixueSubmissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.rain.zhixueproblem.entity.ZhixueSubmission">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="problem_id" property="problemId"/>
+        <result column="language" property="language"/>
+        <result column="code" property="code"/>
+        <result column="code_length" property="codeLength"/>
+        <result column="status" property="status"/>
+        <result column="score" property="score"/>
+        <result column="total_time_ms" property="totalTimeMs"/>
+        <result column="max_memory_kb" property="maxMemoryKb"/>
+        <result column="passed_count" property="passedCount"/>
+        <result column="total_count" property="totalCount"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="is_contest" property="isContest"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="judged_at" property="judgedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, problem_id, language, code, code_length, status, score,
+        total_time_ms, max_memory_kb, passed_count, total_count, error_message,
+        is_contest, created_at, judged_at
+    </sql>
+
+    <insert id="insert" parameterType="com.rain.zhixueproblem.entity.ZhixueSubmission" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zhixue_submission (user_id, problem_id, language, code, code_length, status, score,
+            total_time_ms, max_memory_kb, passed_count, total_count, error_message, is_contest, created_at)
+        VALUES (#{userId}, #{problemId}, #{language}, #{code}, #{codeLength}, #{status}, #{score},
+            #{totalTimeMs}, #{maxMemoryKb}, #{passedCount}, #{totalCount}, #{errorMessage}, #{isContest}, NOW())
+    </insert>
+
+    <update id="updateById" parameterType="com.rain.zhixueproblem.entity.ZhixueSubmission">
+        UPDATE zhixue_submission
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="totalTimeMs != null">total_time_ms = #{totalTimeMs},</if>
+            <if test="maxMemoryKb != null">max_memory_kb = #{maxMemoryKb},</if>
+            <if test="passedCount != null">passed_count = #{passedCount},</if>
+            <if test="totalCount != null">total_count = #{totalCount},</if>
+            <if test="errorMessage != null">error_message = #{errorMessage},</if>
+            <if test="judgedAt != null">judged_at = #{judgedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_submission
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM zhixue_submission
+        <where>
+            <if test="problemId != null">
+                AND problem_id = #{problemId}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="language != null and language != ''">
+                AND language = #{language}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="offset != null and pageSize != null">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countByProblemId" resultType="int">
+        SELECT COUNT(*) FROM zhixue_submission WHERE problem_id = #{problemId}
+    </select>
+
+    <select id="countAcceptedByProblemId" resultType="int">
+        SELECT COUNT(*) FROM zhixue_submission WHERE problem_id = #{problemId} AND status = 'accepted'
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM zhixue_submission WHERE user_id = #{userId}
+    </select>
+
+    <select id="countAcceptedByUserId" resultType="int">
+        SELECT COUNT(*) FROM zhixue_submission WHERE user_id = #{userId} AND status = 'accepted'
+    </select>
+
+    <select id="countList" resultType="int">
+        SELECT COUNT(*)
+        FROM zhixue_submission
+        <where>
+            <if test="problemId != null">
+                AND problem_id = #{problemId}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="language != null and language != ''">
+                AND language = #{language}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
